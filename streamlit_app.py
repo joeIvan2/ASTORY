@@ -4,7 +4,7 @@ from pathlib import Path
 import requests
 from io import BytesIO
 import base64
-import databutton as db
+
 
 # Streamlit page setup
 st.set_page_config(
@@ -17,7 +17,7 @@ st.set_page_config(
 st.title("🎨🔊 Text-Based Image and Speech Generator with AI 👀")
 
 # Retrieve the OpenAI API Key
-api_key = db.secrets.get(name="kkk")  # Update this with the correct key name
+
 
 # Initialize the OpenAI client
 client = OpenAI(api_key=api_key)
@@ -25,7 +25,7 @@ client = OpenAI(api_key=api_key)
 # Variable to store and display the extracted or user-entered text
 user_description_text = ""
 
-google_api_key = db.secrets.get(name="google_api_key")
+
 
 
 # Function to convert text to speech
