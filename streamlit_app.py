@@ -18,7 +18,8 @@ st.title("🎨🔊 Text-Based Image and Speech Generator with AI 👀")
 
 # Retrieve the OpenAI API Key
 
-
+api_key = st.secrets["kkk"]
+google_api_key = st.secrets["google_api_key"]
 # Initialize the OpenAI client
 client = OpenAI(api_key=api_key)
 
