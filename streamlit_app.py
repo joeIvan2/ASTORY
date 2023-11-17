@@ -32,7 +32,7 @@ user_description_text = ""
 
 def convert_text_to_speech(text):
     try:
-        max_length = 30
+        max_length = 3000
         parts = [text[i : i + max_length] for i in range(0, len(text), max_length)]
 
         audio_files = []  # 用于存储生成的音频文件路径
