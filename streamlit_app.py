@@ -32,42 +32,14 @@ user_description_text = ""
 # Function to convert text to speech
 def convert_text_to_speech(text):
     try:
-        url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={google_api_key}"
-        headers = {"Content-Type": "application/json"}
-        body = {
-            "input": {"text": text},
-            "voice": {
-                # Set the language code to Mandarin Chinese (Taiwan)
-                "languageCode": "cmn-TW",
-                # Choose a Taiwanese Mandarin voice, for example, "cmn-TW-Wavenet-A"
-                "name": "cmn-TW-Wavenet-A",
-                "ssmlGender": "NEUTRAL",
-            },
-            "audioConfig": {"audioEncoding": "MP3"},
-        }
-
-        response = requests.post(url, headers=headers, json=body)
-
-        if response.status_code == 200:
-            response_data = response.json()
-            if "audioContent" in response_data:
-                audio_content = base64.b64decode(response_data["audioContent"])
-                with open(speech_file_path, "wb") as audio_file:
-                    audio_file.write(audio_content)
-                return True
-            else:
-                st.error("Failed to generate speech: No audio content")
-                return False
-        else:
-            # Print the error details if the request was not successful
-            st.error(
-                f"Failed to generate speech: {response.status_code} - {response.text}"
-            )
-            return False
-
+        response = client.audio.speech.create(model="tts-1", voice="nova", input=text)
+        response.stream_to_file(speech_file_path)
+        return True
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return False
+
+
 
 
 # Function to encode the image to base64
