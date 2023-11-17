@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # Page heading
-st.title("🎨🔊 Text-Based Image and Speech Generator with AI 👀")
+st.title("🎨🔊 透過 AI 把圖片內的文字轉成語音 + 文字轉想像圖 👀")
 
 # Retrieve the OpenAI API Key
 
@@ -93,7 +93,7 @@ def call_vision_api(image_base64):
 
 
 # File uploader for images
-camera_image = st.camera_input("Take a picture")
+camera_image = st.camera_input("拍照文字")
 
 # Check if an image is captured and extract text button is pressed
 if camera_image:
@@ -116,7 +116,7 @@ if camera_image:
 
 # Text input for user's description
 user_description = st.text_area(
-    "Enter your description or text here:", value=user_description_text
+    "要轉成語音的文字:", value=user_description_text
 )
 
 # Directory to save the speech file
@@ -137,8 +137,8 @@ def auto_convert_to_speech(description):
 auto_convert_to_speech(user_description)
 
 # Buttons for different actions
-generate_image_button = st.button("Generate Image")
-convert_speech_button = st.button("Convert to Speech")
+generate_image_button = st.button("利用AI把文字轉成圖片")
+convert_speech_button = st.button("將文字轉成語音")
 
 # Directory to save the speech file
 speech_file_dir = Path(__file__).parent
