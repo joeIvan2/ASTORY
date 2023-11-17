@@ -29,17 +29,25 @@ user_description_text = ""
 
 
 
-# Function to convert text to speech
 def convert_text_to_speech(text):
     try:
-        response = client.audio.speech.create(model="tts-1", voice="nova", input=text)
-        response.stream_to_file(speech_file_path)
-        return True
+        max_length = 3000
+        parts = [text[i : i + max_length] for i in range(0, len(text), max_length)]
+
+        audio_files = []  # 用于存储生成的音频文件路径
+
+        for index, part in enumerate(parts):
+            response = client.audio.speech.create(
+                model="tts-1", voice="nova", input=part
+            )
+            part_file = f"output_part_{index}.mp3"
+            response.stream_to_file(part_file)
+            audio_files.append(part_file)
+
+        return audio_files
     except Exception as e:
         st.error(f"An error occurred: {e}")
-        return False
-
-
+        return []
 
 
 # Function to encode the image to base64
@@ -65,7 +73,7 @@ def call_vision_api(image_base64):
 
 
 # File uploader for images
-camera_image = st.camera_input("拍照文字")
+camera_image = st.camera_input("Take a picture")
 
 # Check if an image is captured and extract text button is pressed
 if camera_image:
@@ -86,21 +94,42 @@ if camera_image:
         else:
             st.error("Failed to process the image.")
 
+
+# File uploader for images (multiple files)
+uploaded_files = st.file_uploader("Upload files", accept_multiple_files=True)
+
+# Process each uploaded file
+if uploaded_files:
+    user_description_text = ""
+    texts = []
+    for uploaded_file in uploaded_files:
+        image_base64 = encode_image_to_base64(uploaded_file)
+        response = call_vision_api(image_base64)
+
+        if response and "responses" in response:
+            text_annotations = response["responses"][0].get("textAnnotations", [])
+            if text_annotations:
+                text = text_annotations[0]["description"]
+                texts.append(text)  # Collect text from each file
+
+    # Combine texts in reverse order
+    user_description_text = "\n".join(texts)
+
+    # Update user_description_text with all extracted text
+
 # Text input for user's description
 user_description = st.text_area(
-    "要轉成語音的文字:", value=user_description_text
+    "Enter your description or text here:", value=user_description_text
 )
-
-# Directory to save the speech file
-speech_file_dir = Path(__file__).parent
-speech_file_path = speech_file_dir / "speech.mp3"
 
 
 # Function to automatically convert text to speech if there is a description
 def auto_convert_to_speech(description):
     if description:
-        if convert_text_to_speech(description):
-            st.audio(str(speech_file_path), format="audio/mpeg", start_time=0)
+        audio_files = convert_text_to_speech(description)
+        if audio_files:
+            for audio_file in audio_files:
+                st.audio(audio_file, format="audio/mpeg", start_time=0)
         else:
             st.error("Failed to convert text to speech.")
 
@@ -109,12 +138,9 @@ def auto_convert_to_speech(description):
 auto_convert_to_speech(user_description)
 
 # Buttons for different actions
-generate_image_button = st.button("利用AI把文字轉成圖片")
-convert_speech_button = st.button("將文字轉成語音")
+generate_image_button = st.button("Generate Image")
+convert_speech_button = st.button("Convert to Speech")
 
-# Directory to save the speech file
-speech_file_dir = Path(__file__).parent
-speech_file_path = speech_file_dir / "speech.mp3"
 
 # Check if a description is provided and generate image button is pressed
 if user_description and generate_image_button:
@@ -137,11 +163,3 @@ if user_description and generate_image_button:
 
         except Exception as e:
             st.error(f"An error occurred: {e}")
-
-# Check if text is provided and convert to speech button is pressed
-if user_description and convert_speech_button:
-    if convert_text_to_speech(user_description):
-        st.audio(str(speech_file_path), format="audio/mpeg", start_time=0)
-else:
-    if not user_description and (generate_image_button or convert_speech_button):
-        st.warning("Please enter a description or text.")
