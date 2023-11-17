@@ -169,7 +169,7 @@ if user_description and generate_image_button:
 # Check if text is provided and convert to speech button is pressed
 if user_description and convert_speech_button:
     if convert_text_to_speech(user_description):
-        st.audio(str(speech_file_path), format="audio/mp3", start_time=0)
+        st.audio(str(speech_file_path), format="audio/mpeg", start_time=0)
 else:
     if not user_description and (generate_image_button or convert_speech_button):
         st.warning("Please enter a description or text.")
