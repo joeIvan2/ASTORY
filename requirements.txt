@@ -1,0 +1,4 @@
+openai
+google-cloud-vision
+requests
+streamlit-back-camera-input
