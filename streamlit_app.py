@@ -128,7 +128,7 @@ speech_file_path = speech_file_dir / "speech.mp3"
 def auto_convert_to_speech(description):
     if description:
         if convert_text_to_speech(description):
-            st.audio(str(speech_file_path), format="audio/mp3", start_time=0)
+            st.audio(str(speech_file_path), format="audio/mpeg", start_time=0)
         else:
             st.error("Failed to convert text to speech.")
 
