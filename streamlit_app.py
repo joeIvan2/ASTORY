@@ -1,5 +1,6 @@
 import streamlit as st
 from openai import OpenAI
+from pydub import AudioSegment
 from pathlib import Path
 import requests
 from io import BytesIO
@@ -31,7 +32,7 @@ user_description_text = ""
 
 def convert_text_to_speech(text):
     try:
-        max_length = 3000
+        max_length = 30
         parts = [text[i : i + max_length] for i in range(0, len(text), max_length)]
 
         audio_files = []  # 用于存储生成的音频文件路径
@@ -122,14 +123,23 @@ user_description = st.text_area(
     "Enter your description or text here:", value=user_description_text
 )
 
+def merge_audio_files(audio_files):
+    combined = AudioSegment.empty()
+    for file in audio_files:
+        audio = AudioSegment.from_mp3(file)
+        combined += audio
+    output_file = "combined_output.mp3"
+    combined.export(output_file, format="mp3")
+    return output_file
 
 # Function to automatically convert text to speech if there is a description
 def auto_convert_to_speech(description):
     if description:
         audio_files = convert_text_to_speech(description)
         if audio_files:
-            for audio_file in audio_files:
-                st.audio(audio_file, format="audio/mpeg", start_time=0)
+            # 合并音频文件
+            combined_audio_file = merge_audio_files(audio_files)
+            st.audio(combined_audio_file, format="audio/mpeg", start_time=0)
         else:
             st.error("Failed to convert text to speech.")
 
